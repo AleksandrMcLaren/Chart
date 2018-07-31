@@ -12,7 +12,7 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    var lineChart = LineChartViewController()
+    let lineChart = LineChartViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
