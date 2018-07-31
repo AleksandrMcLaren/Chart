@@ -23,23 +23,23 @@ let maxValue: Double = 10
 let randomValues = (1...countValues).map{_ in genRandom(min: minValue, max: maxValue)}
 let sumValues = randomValues.reduce(0, +)
 let percentValue = sumValues / 100
+var times = [Any]()
+var sumPercents = [Any]()
+
+/// Алгоритм 1 ----------------------------------------
 
 var percents = [Decimal]()
+
+var startTime = CFAbsoluteTimeGetCurrent()
 for value in randomValues {
     let percent = value / percentValue
     let roundedPercent = roundToDecimal(percent, scale: scale)
     percents.append(roundedPercent)
 }
+times.append(CFAbsoluteTimeGetCurrent() - startTime)
+sumPercents.append(percents.reduce(0, +))
 
-//print(percents)
-
-let testPercentSum = percents.reduce(0, +)
-print(testPercentSum)
-
-
-/**
- *   Если нужно чтобы были тысячные полностью (с нулями в конце), будут строки
- */
+/// Алгоритм 2 ----------------------------------------
 
 let formatter = NumberFormatter()
 formatter.numberStyle = .decimal
@@ -48,11 +48,33 @@ formatter.minimumFractionDigits = scale
 formatter.roundingMode = .halfUp
 
 var stringPercents = [String]()
+
+startTime = CFAbsoluteTimeGetCurrent()
 for value in randomValues {
     let percent = value / percentValue
     if let roundedPercent = formatter.string(from: NSNumber(value: percent)) {
         stringPercents.append(roundedPercent)
     }
 }
+times.append(CFAbsoluteTimeGetCurrent() - startTime)
+sumPercents.append("strings")
 
-//print(stringPercents)
+/// Алгоритм 3 ----------------------------------------
+
+var doublePercents = [Double]()
+let divisor = pow(10.0, Double(scale))
+
+startTime = CFAbsoluteTimeGetCurrent()
+for value in randomValues {
+    let percent = value / percentValue
+    let roundedPercent = (percent * divisor).rounded() / divisor
+    doublePercents.append(roundedPercent)
+}
+times.append(CFAbsoluteTimeGetCurrent() - startTime)
+sumPercents.append(doublePercents.reduce(0, +))
+
+/*
+ *  Лучше использовать алгоритм 3. Не переводит значения в строки, быстрее чем алгоритм 1.
+ */
+print(times)
+print(sumPercents)
