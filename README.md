@@ -1,7 +1,7 @@
 # LineChartViewController
 
 <p align="center" >
-<img src="chart_image.png" float=left>
+<img src="screenshots/chart_image.png">
 </p>
 
 Класс реализует контроллер с графиком, выпадающим списком показателей, горизонтальным списком кнопок с периодами. Вид экземпляра класса необходимо добавить на родительский, задать виду фрейм. Для загрузки данных необходимо присвоить значение isin:
@@ -33,8 +33,16 @@ ButtonsViewController – горизонтальный список кнопок
 
 ## DropListViewController
 
-Класс реализует выпадающий список. Список реализован через UITableView. Принимает заголовки строк таблицы через setDataSource: . Сообщает о выбранной строке в selectedRow:
+<p align="center" >
+<img src="screenshots/drop_list_image.png">
+</p>
+
+Класс реализует выпадающий список. Список реализован через UITableView. Принимает заголовки строк таблицы в методе setDataSource: . Сообщает о выбранной строке в selectedRow:
 
 ## ButtonsViewController
 
-Класс реализует горизонтальный список кнопок. Список реализован через UIStackView с UIButton. Принимает заголовки кнопок через dataSource: Сообщает о выбранном индексе в selectedIndex:
+<p align="center" >
+<img src="screenshots/buttons_image.png">
+</p>
+
+Класс реализует горизонтальный список кнопок. Список реализован через UIStackView с UIButton. Принимает заголовки кнопок через dataSource: .  Сообщает о выбранном индексе в selectedIndex: .

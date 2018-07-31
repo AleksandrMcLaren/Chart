@@ -20,6 +20,8 @@ class ViewController: UIViewController {
         self.addChildViewController(self.lineChart)
         self.view.addSubview(self.lineChart.view)
 
+        addViewConstraints()
+
         self.lineChart.isin = "12345"
     }
 
