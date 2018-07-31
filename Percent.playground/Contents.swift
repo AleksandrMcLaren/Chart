@@ -16,9 +16,9 @@ func roundToDecimal(_ value: Double, scale: Int) -> Decimal {
 }
 
 let scale = 3
-let countValues = 500
+let countValues = 1800
 let minValue: Double = 0.5
-let maxValue: Double = 10
+let maxValue: Double = 10000
 
 let randomValues = (1...countValues).map{_ in genRandom(min: minValue, max: maxValue)}
 let sumValues = randomValues.reduce(0, +)
@@ -28,16 +28,16 @@ var sumPercents = [Any]()
 
 /// Алгоритм 1 ----------------------------------------
 
-var percents = [Decimal]()
+var decimalPercents = [Decimal]()
 
 var startTime = CFAbsoluteTimeGetCurrent()
 for value in randomValues {
     let percent = value / percentValue
     let roundedPercent = roundToDecimal(percent, scale: scale)
-    percents.append(roundedPercent)
+    decimalPercents.append(roundedPercent)
 }
 times.append(CFAbsoluteTimeGetCurrent() - startTime)
-sumPercents.append(percents.reduce(0, +))
+sumPercents.append(decimalPercents.reduce(0, +))
 
 /// Алгоритм 2 ----------------------------------------
 
@@ -74,7 +74,9 @@ times.append(CFAbsoluteTimeGetCurrent() - startTime)
 sumPercents.append(doublePercents.reduce(0, +))
 
 /*
- *  Лучше использовать алгоритм 3. Не переводит значения в строки, быстрее чем алгоритм 1.
+ *  Лучше использовать алгоритм 3. Не приводит тип к String, быстрее алгоритма с Decimal типом.
+ *  Для алгоритма 3 ограничение на размер для входного массива 1800 элементов (время выполнения до 5 секунд).
+ *  Процессор 2,7 GHz Intel Core i5.
  */
-print(times)
-print(sumPercents)
+print("times", times)
+print("sumPercents", sumPercents)
