@@ -26,7 +26,7 @@ lineChart.isin = "12345"
 
 ## LineChart
 
-Класс реализует линейный график/графики.
+Класс UIView рисует линейный график/графики.
 
 ## DropListViewController
 
