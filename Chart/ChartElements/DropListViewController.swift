@@ -21,7 +21,7 @@ protocol DropListPresentable {
         Если контент открытой таблицы больше maxHeight, включится скролл таблицы. */
     var maxHeight: CGFloat? { get set }
     /// Задает массив строк списка.
-    func setDataSource(_ source: [String])
+    var dataSource: [String]? { get set }
     /// Закрывает список. Можно вызвать, например, после изменения ориентации устроства.
     func hide()
 }
@@ -30,13 +30,15 @@ class DropListViewController: UIViewController, DropListPresentable {
 
     // MARK: - DropListPresentable
 
-    public func setDataSource(_ source: [String]) {
-        self.dataSource = source
-        self.tableView.reloadData()
-        /// для новых данных возьмем новую высоту
-        self.viewHeight.max = CGFloat(dataSource.count) * self.viewHeight.min
-        /// сохраним для нахождения оригинального индекса
-        self.originalDataSource = dataSource
+    public var dataSource: [String]? {
+        didSet {
+            self.source = dataSource ?? [String]()
+            self.tableView.reloadData()
+            /// для новых данных возьмем новую высоту
+            self.viewHeight.max = CGFloat(source.count) * self.viewHeight.min
+            /// сохраним для нахождения оригинального индекса
+            self.originalDataSource = source
+        }
     }
 
     public var selectedRow: ((_ row: Int) -> Void)?
@@ -51,7 +53,7 @@ class DropListViewController: UIViewController, DropListPresentable {
 
     // MARK: -
 
-    fileprivate var dataSource = [String]()
+    fileprivate var source = [String]()
     fileprivate var isDrop = false
     fileprivate let cellId = "cell"
     fileprivate let shadowView: UIView = UIView()
@@ -94,7 +96,7 @@ class DropListViewController: UIViewController, DropListPresentable {
         if self.viewHeight.min == 0 {
             /// при первом фрейме обновим высоты
             self.viewHeight.min = self.view.bounds.height
-            self.viewHeight.max = CGFloat(dataSource.count) * self.viewHeight.min
+            self.viewHeight.max = CGFloat(self.source.count) * self.viewHeight.min
             /// обновим ограничения
             self.heightShadowConstraint.constant = self.viewHeight.min
             self.heightTableConstraint.constant = self.viewHeight.min
@@ -170,7 +172,7 @@ class DropListViewController: UIViewController, DropListPresentable {
         }
 
         self.isDrop = false
-        
+
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: paths, with: .automatic)
         self.tableView.endUpdates()
@@ -189,7 +191,7 @@ class DropListViewController: UIViewController, DropListPresentable {
         т.е. тех которые участвуют в анимации открытия/закрытия. */
     fileprivate func dropRowPaths() -> [IndexPath]? {
         var paths: [IndexPath]?
-        let count = self.dataSource.count
+        let count = self.source.count
         if count > 1 {
             paths = [IndexPath]()
             for i in 1..<count {
@@ -211,7 +213,7 @@ class DropListViewController: UIViewController, DropListPresentable {
             /// закрыли список
             hideList()
         } else {
-            let valueByRow = self.dataSource[row]
+            let valueByRow = self.source[row]
             /// выбрали новую строку, поставим ее наверх
             moveToFirstRowIndex(row)
             /// закроем список после перезагрузки таблицы
@@ -231,15 +233,15 @@ class DropListViewController: UIViewController, DropListPresentable {
         остальные элементы остаются по своей сортировке,
         обновляет таблицу. */
     fileprivate func moveToFirstRowIndex(_ index: Int) {
-        if index < self.dataSource.count {
+        if index < self.source.count {
             self.tableView.beginUpdates()
-            let element = self.dataSource[index]
+            let element = self.source[index]
             var newListValues = self.originalDataSource
             if let originalIndex = self.originalDataSource.index(of: element) {
                 newListValues.remove(at: originalIndex)
                 newListValues.insert(element, at: 0)
             }
-            self.dataSource = newListValues
+            self.source = newListValues
             self.tableView.reloadData()
             self.tableView.endUpdates()
         }
@@ -249,14 +251,14 @@ class DropListViewController: UIViewController, DropListPresentable {
 extension DropListViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (isDrop ? self.dataSource.count : 1)
+        return (isDrop ? self.source.count : 1)
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
 
-        if indexPath.row < self.dataSource.count {
-            cell.textLabel?.text = self.dataSource[indexPath.row]
+        if indexPath.row < self.source.count {
+            cell.textLabel?.text = self.source[indexPath.row]
             cell.textLabel?.font = self.textLabelFont
             cell.selectionStyle = .none
             cell.accessoryType = (indexPath.row == 0 ? .disclosureIndicator : .none)

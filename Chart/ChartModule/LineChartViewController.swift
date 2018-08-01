@@ -74,7 +74,7 @@ class LineChartViewController: UIViewController, LineChartPresentable {
             /// выпадающий список
             viewModel.updateDropListTitles = { [unowned self] (value) in
                 self.dropList.view.isHidden = false
-                self.dropList.setDataSource(value)
+                self.dropList.dataSource = value
             }
             /// кнопки с периодами
             viewModel.updateBottomButtonTitles = { [unowned self] (value) in

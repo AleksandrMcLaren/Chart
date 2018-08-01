@@ -23,13 +23,13 @@ class DropListViewControllerTests: XCTestCase {
 
         /// запуск с данными
         self.dropList = DropListViewController()
-        self.dropList.setDataSource(["YIELD", "PRICE"])
+        self.dropList.dataSource = ["YIELD", "PRICE"]
         self.dropList.selectedRow = { (row) in }
         self.dropList.textLabelFont = UIFont.systemFont(ofSize: 12)
         self.dropList.viewDidLoad()
 
         /// запуск с пустым массивом
-        self.dropList.setDataSource([])
+        self.dropList.dataSource = []
         self.dropList.viewDidLoad()
     }
     
