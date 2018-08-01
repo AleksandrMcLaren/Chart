@@ -136,60 +136,65 @@ class DropListViewController: UIViewController, DropListPresentable {
 
     /// Открывает список.
     fileprivate func dropList() {
-        if let paths = dropRowPaths() {
-            self.isDrop = true
-
-            var needsScroll = false
-            var maxViewHeight = self.viewHeight.max
-            if let maxHeight = self.maxHeight, maxViewHeight > maxHeight {
-                maxViewHeight = maxHeight
-                needsScroll = true
-            }
-
-            self.heightShadowConstraint.constant = maxViewHeight
-            self.heightTableConstraint.constant = maxViewHeight
-            UIView.animate(withDuration: 0.3, animations: {
-                self.view.frame.size = CGSize(width: self.view.frame.width, height: maxViewHeight)
-                self.view.layoutIfNeeded()
-            }) { (finished) in
-                self.tableView.isScrollEnabled = needsScroll
-            }
-
-            self.tableView.beginUpdates()
-            self.tableView.insertRows(at: paths, with: .automatic)
-            self.tableView.endUpdates()
+        guard let paths = dropRowPaths() else {
+            return
         }
+
+        self.isDrop = true
+
+        var needsScroll = false
+        var maxViewHeight = self.viewHeight.max
+        if let maxHeight = self.maxHeight, maxViewHeight > maxHeight {
+            maxViewHeight = maxHeight
+            needsScroll = true
+        }
+
+        self.heightShadowConstraint.constant = maxViewHeight
+        self.heightTableConstraint.constant = maxViewHeight
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.frame.size = CGSize(width: self.view.frame.width, height: maxViewHeight)
+            self.view.layoutIfNeeded()
+        }) { (finished) in
+            self.tableView.isScrollEnabled = needsScroll
+        }
+
+        self.tableView.beginUpdates()
+        self.tableView.insertRows(at: paths, with: .automatic)
+        self.tableView.endUpdates()
     }
 
     /// Закрывает список.
     fileprivate func hideList() {
-        if let paths = dropRowPaths() {
-            self.isDrop = false
+        guard let paths = dropRowPaths() else {
+            return
+        }
 
-            self.tableView.beginUpdates()
-            self.tableView.deleteRows(at: paths, with: .automatic)
-            self.tableView.endUpdates()
+        self.isDrop = false
+        
+        self.tableView.beginUpdates()
+        self.tableView.deleteRows(at: paths, with: .automatic)
+        self.tableView.endUpdates()
 
-            self.heightShadowConstraint.constant = self.viewHeight.min
-            self.heightTableConstraint.constant = self.viewHeight.min
-            UIView.animate(withDuration: 0.3, animations: {
-                self.view.frame.size = CGSize(width: self.view.frame.width, height: self.viewHeight.min)
-                self.view.layoutIfNeeded()
-            }) { (finished) in
-                self.tableView.isScrollEnabled = false
-            }
+        self.heightShadowConstraint.constant = self.viewHeight.min
+        self.heightTableConstraint.constant = self.viewHeight.min
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.frame.size = CGSize(width: self.view.frame.width, height: self.viewHeight.min)
+            self.view.layoutIfNeeded()
+        }) { (finished) in
+            self.tableView.isScrollEnabled = false
         }
     }
 
     /** Возвращает массив IndexPath с первого индекса.
         т.е. тех которые участвуют в анимации открытия/закрытия. */
     fileprivate func dropRowPaths() -> [IndexPath]? {
-        var paths = [IndexPath]()
-        if !self.dataSource.isEmpty {
-            let end = self.dataSource.count
-            for i in 1..<end {
+        var paths: [IndexPath]?
+        let count = self.dataSource.count
+        if count > 1 {
+            paths = [IndexPath]()
+            for i in 1..<count {
                 let path = IndexPath(row: i, section: 0)
-                paths.append(path)
+                paths!.append(path)
             }
         }
         return paths
