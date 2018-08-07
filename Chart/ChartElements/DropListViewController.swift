@@ -221,14 +221,13 @@ class DropListViewController: UIViewController, DropListPresentable {
         остальные элементы остаются по своей сортировке,
         обновляет таблицу. */
     fileprivate func moveToFirstRowIndex(_ index: Int) {
-        if index < self.tableSource.count {
-            let element = self.tableSource[index]
-            if var newListValues = self.dataSource, let originalIndex = newListValues.index(of: element) {
-                newListValues.remove(at: originalIndex)
-                newListValues.insert(element, at: 0)
-                self.tableSource = newListValues
-                self.tableView.reloadData()
-            }
+        if let element = self.tableSource[guarded: index],
+            var newListValues = self.dataSource,
+            let originalIndex = newListValues.index(of: element) {
+            newListValues.remove(at: originalIndex)
+            newListValues.insert(element, at: 0)
+            self.tableSource = newListValues
+            self.tableView.reloadData()
         }
     }
 }
@@ -242,8 +241,8 @@ extension DropListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath)
 
-        if indexPath.row < self.tableSource.count {
-            cell.textLabel?.text = self.tableSource[indexPath.row]
+        if let text = self.tableSource[guarded: indexPath.row] {
+            cell.textLabel?.text = text
             cell.textLabel?.font = self.textLabelFont
             cell.selectionStyle = .none
             cell.accessoryType = (indexPath.row == 0 ? .disclosureIndicator : .none)
@@ -281,5 +280,14 @@ extension Array {
         }
 
         return paths
+    }
+
+    /// Возвращает элемент по индексу или nil.
+    subscript(guarded idx: Int) -> Element? {
+        guard (self.startIndex..<self.endIndex).contains(idx) else {
+            return nil
+        }
+
+        return self[idx]
     }
 }
